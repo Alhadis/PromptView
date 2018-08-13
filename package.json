@@ -1,0 +1,11 @@
+{
+	"name": "prompt-view",
+	"version": "v0.0.0",
+	"main": "prompt-view.js",
+	"description": "Modal dialogue for asynchronously prompting users for their input.",
+	"author": "John Gardner <gardnerjohng@gmail.com>",
+	"atomTestRunner": "atom-mocha",
+	"devDependencies": {
+		"atom-mocha": "^2.0.5"
+	}
+}
