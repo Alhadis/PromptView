@@ -2,11 +2,11 @@
 
 const {TextEditor} = require("atom");
 const currentPrompts = new WeakMap();
+const internalValues = new WeakMap();
 
 
 /**
  * Modal dialogue for asynchronously prompting users for their input.
- * TODO: Move this class to a separate module?
  * @class
  */
 class PromptView{
@@ -18,11 +18,15 @@ class PromptView{
 	 * @constructor
 	 */
 	constructor(opts = {}){
+		internalValues.set(this, {
+			autoFocus: true,
+			autoHide: false,
+			autoHideHandler: null,
+		});
 		
 		// Setup DOM
 		this.buildTree(opts);
 		this.panel = atom.workspace.addModalPanel({visible: false, item: this});
-		this.inputField.element.addEventListener("blur", () => this.confirm(null));
 		atom.commands.add(this.inputField.element, {
 			"core:confirm": () => this.confirm(this.input),
 			"core:cancel":  () => this.confirm(null),
@@ -30,6 +34,7 @@ class PromptView{
 		
 		// Assign initial property values
 		this.assignProps({
+			autoHide:     true,
 			elementClass: "prompt",
 			headerClass:  "prompt-header",
 			footerClass:  "prompt-footer",
@@ -127,9 +132,7 @@ class PromptView{
 		else{
 			this.input = "";
 			this.assignProps(this, opts);
-			this.saveFocus();
-			this.panel.show();
-			this.inputField.element.focus();
+			this.show();
 			
 			let handler = null;
 			const promise = new Promise(fn => handler = fn);
@@ -151,11 +154,35 @@ class PromptView{
 		currentPrompts.delete(this);
 		
 		this.input = "";
-		this.panel.hide();
-		this.restoreFocus();
+		this.hide();
 		
 		if("function" === typeof prompt.handler)
 			prompt.handler.call(null, input);
+	}
+	
+	
+	/**
+	 * Reveal prompt-view and set focus without altering prompt state.
+	 * @internal
+	 */
+	show(){
+		this.autoFocus && this.saveFocus();
+		this.panel
+			? this.panel.show()
+			: this.element.hidden = false;
+		this.autoFocus && this.inputField.element.focus();
+	}
+	
+	
+	/**
+	 * Hide prompt-view and restore focus without resolving current prompt.
+	 * @internal
+	 */
+	hide(){
+		this.panel
+			? this.panel.hide()
+			: this.element.hidden = true;
+		this.autoFocus && this.restoreFocus();
 	}
 	
 	
@@ -196,6 +223,45 @@ class PromptView{
 	set input(to){
 		if(this.inputField)
 			this.inputField.setText(to);
+	}
+	
+	
+	/**
+	 * @property {Boolean} [autoFocus=true]
+	 * @description Set and restore focus when toggling prompt.
+	 */
+	get autoFocus(){
+		return internalValues.get(this).autoFocus;
+	}
+	set autoFocus(to){
+		const data = internalValues.get(this);
+		if((to = !!to) === data.autoFocus) return;
+		data.autoFocus = to;
+		if(!to && this.previouslyFocussedElement)
+			this.previouslyFocussedElement = null;
+	}
+	
+	
+	/**
+	 * @property {Boolean} [autoHide=true]
+	 * @description Hide the prompt upon losing focus.
+	 */
+	get autoHide(){
+		return internalValues.get(this).autoHide;
+	}
+	set autoHide(to){
+		const data = internalValues.get(this);
+		if((to = !!to) === data.autoHide) return;
+		switch(data.autoHide = to){
+			case true:
+				data.autoHideHandler = () => this.confirm(null);
+				this.inputField.element.addEventListener("blur", data.autoHideHandler);
+				break;
+			case false:
+				this.inputField.element.removeEventListener("blur", data.autoHideHandler);
+				data.autoHideHandler = null;
+				break;
+		}
 	}
 	
 	
