@@ -5,7 +5,15 @@ const {expect} = Chai;
 Chai.should();
 
 describe("PromptView", () => {
+	const {delay, cancel, confirm} = require("./utils.js");
 	const PromptView = require("../prompt-view.js");
+	
+	let paneEditor = null;
+	before("Setting up workspace", async () => {
+		attachToDOM(atom.workspace.getElement());
+		paneEditor = await atom.workspace.open();
+		paneEditor.element.focus();
+	});
 	
 	when("constructed", () => {
 		it("keeps the view hidden", () => {
@@ -71,5 +79,155 @@ describe("PromptView", () => {
 			const prompt = new PromptView({foo: bar});
 			prompt.should.have.property("foo").that.equals(bar);
 		});
+		
+		it("lets properties be modified after construction", () => {
+			const prompt = new PromptView();
+			prompt.headerText = "Header";
+			prompt.footerText = "Footer";
+			prompt.headerClass = "header-thing";
+			prompt.footerClass = "footer-thing";
+			prompt.headerElement.textContent.should.equal("Header");
+			prompt.footerElement.textContent.should.equal("Footer");
+			prompt.headerElement.should.have.class("header-thing");
+			prompt.footerElement.should.have.class("footer-thing");
+		});
+	});
+	
+	
+	let answer = "";
+	let prompt = null;
+	let elements = null;
+	
+	when("the user is prompted", () => {
+		before(() => {
+			prompt = new PromptView();
+			elements = [prompt.element, prompt.headerElement, prompt.footerElement];
+		});
+		
+		it("displays the view", () => {
+			prompt.element.contains(document.activeElement).should.be.false;
+			prompt.element.should.not.be.drawn;
+			prompt.promptUser({
+				headerText: "Enter a number",
+				footerHTML: "Just type <code>42</code>.",
+				elementClass: "calc-prompt",
+				headerClass: "calc-header",
+				footerClass: "calc-footer",
+			}).then(value => answer = value);
+			prompt.element.should.be.drawn;
+		});
+		
+		it("shifts focus to the input field", () =>
+			prompt.element.contains(document.activeElement).should.be.true);
+		
+		it("updates header and footer text", () => {
+			prompt.headerText.should.equal("Enter a number");
+			prompt.footerText.should.equal("Just type 42.");
+			prompt.footerHTML.should.equal("Just type <code>42</code>.");
+		});
+		
+		it("updates element classes", () => {
+			prompt.element.should.have.class("calc-prompt");
+			prompt.headerElement.should.have.class("calc-header");
+			prompt.footerElement.should.have.class("calc-footer");
+		});
+	});
+	
+	when("the user responds", () => {
+		it("resolves the handler with their answer", async () => {
+			prompt.input = "42, obviously.";
+			confirm(prompt.inputField.element);
+			await delay(50);
+			answer.should.equal("42, obviously.");
+		});
+		
+		it("hides the view", () =>
+			prompt.element.should.not.be.drawn);
+		
+		it("clears the entry field", () =>
+			prompt.input.should.equal(""));
+		
+		it("restores focus to the previously-active element", () =>
+			prompt.element.contains(document.activeElement).should.be.false);
+	});
+	
+	when("rerunning the prompt", () => {
+		const args = {
+			headerText: "Enter another number",
+			footerHTML: "<small>Uh, please.</small>",
+		};
+		
+		when("already prompting", () => {
+			let originalPromise;
+			let callCount = 0;
+			const handler = value => { ++callCount; answer += value; };
+			before(() => answer = "");
+			
+			it("reuses the original Promise", () => {
+				originalPromise = prompt.promptUser(args);
+				originalPromise.then(handler);
+				const secondPromise = prompt.promptUser(args);
+				secondPromise.should.equal(originalPromise);
+			});
+			
+			it("doesn't care if parameters differ", () => {
+				prompt.promptUser({
+					headerText: "This gets ignored",
+					footerText: "At least it should.",
+				}).should.equal(originalPromise);
+				prompt.headerText.should.equal(args.headerText);
+				prompt.footerHTML.should.equal(args.footerHTML);
+				prompt.footerText.should.equal("Uh, please.");
+			});
+			
+			it("calls the prompt-handler only once", async () => {
+				prompt.input = "53";
+				confirm(prompt.inputField.element);
+				await delay(50);
+				prompt.element.should.not.be.drawn;
+				callCount.should.equal(1);
+				answer.should.equal("53");
+			});
+		});
+		
+		when("already finished", () => {
+			it("displays the view a second time", () => {
+				prompt.element.should.not.be.drawn;
+				prompt.promptUser(args).then(value => answer = value);
+				prompt.element.should.be.drawn;
+				const [element, header, footer] = elements;
+				prompt.element.should.equal(element);
+				prompt.headerElement.should.equal(header);
+				prompt.footerElement.should.equal(footer);
+			});
+
+			it("shifts focus to the entry field", () =>
+				prompt.element.contains(document.activeElement).should.be.true);
+
+			it("updates headers and footers with new text", () => {
+				prompt.headerElement.textContent.should.equal("Enter another number");
+				prompt.footerElement.textContent.should.equal("Uh, please.");
+				prompt.footerElement.innerHTML.should.equal("<small>Uh, please.</small>");
+			});
+		});
+	});
+	
+	when("the user cancels", () => {
+		it("resolves the handler with a null value", async () => {
+			answer.should.equal("53");
+			prompt.input = "53";
+			cancel(prompt.inputField.element);
+			await delay(50);
+			expect(answer).to.be.null;
+		});
+		
+		it("hides the view", () =>
+			prompt.element.should.not.be.drawn);
+		
+		it("clears the entry field", () =>
+			prompt.input.should.equal(""));
+		
+		it("restores focus to the previously-active element", () =>
+			prompt.element.contains(document.activeElement).should.be.false);
 	});
 });
