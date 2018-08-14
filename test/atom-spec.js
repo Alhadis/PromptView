@@ -230,4 +230,70 @@ describe("PromptView", () => {
 		it("restores focus to the previously-active element", () =>
 			prompt.element.contains(document.activeElement).should.be.false);
 	});
+	
+	when("losing input focus", () => {
+		let prompt = null;
+		before(() => {
+			paneEditor.element.focus();
+			paneEditor.component.focused.should.be.true;
+			prompt = new PromptView({headerText: "Enter anything"});
+		});
+		
+		when("autoHide is enabled", () =>
+			it("aborts the current prompt", async () => {
+				prompt.promptUser();
+				prompt.element.should.be.drawn;
+				prompt.element.contains(document.activeElement).should.be.true;
+				prompt.input = "Anything";
+				await delay(50);
+				paneEditor.element.focus();
+				prompt.element.should.not.be.drawn;
+				prompt.element.contains(document.activeElement).should.be.false;
+			}));
+		
+		when("autoHide is disabled", () => {
+			it("keeps the view open", async () => {
+				let result = null;
+				prompt.promptUser({autoHide: false}).then(value => result = value);
+				prompt.element.should.be.drawn;
+				prompt.element.contains(document.activeElement).should.be.true;
+				prompt.input.should.equal("");
+				prompt.input = "Something";
+				
+				await delay(50);
+				paneEditor.element.focus();
+				prompt.element.should.be.drawn;
+				prompt.element.contains(document.activeElement).should.be.false;
+				prompt.input.should.equal("Something");
+				
+				prompt.inputField.element.focus();
+				prompt.element.contains(document.activeElement).should.be.true;
+				confirm(prompt.inputField.element);
+				await delay(50);
+				expect(result).to.equal("Something");
+				prompt.element.should.not.be.drawn;
+				prompt.element.contains(document.activeElement).should.be.false;
+			});
+			
+			it("doesn't care if autoHide was set when opened", async () => {
+				let result = null;
+				prompt = new PromptView();
+				prompt.promptUser({headerText: "Take 1"}).then(value => result = value);
+				expect(prompt.previouslyFocussedElement).not.to.be.null;
+				prompt.input = "Answer 1";
+				prompt.autoHide.should.be.true;
+				
+				prompt.autoHide = false;
+				prompt.autoHide.should.be.false;
+				paneEditor.element.focus();
+				paneEditor.component.focused.should.be.true;
+				prompt.element.should.be.drawn;
+				prompt.element.contains(document.activeElement).should.be.false;
+				prompt.element.focus();
+				confirm(prompt.inputField.element);
+				await delay(50);
+				expect(result).to.equal("Answer 1");
+			});
+		});
+	});
 });
