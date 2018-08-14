@@ -25,7 +25,7 @@ class PromptView{
 		});
 		
 		// Setup DOM
-		this.buildTree(opts);
+		this.buildTree(opts = this.normaliseProps(opts));
 		this.panel = atom.workspace.addModalPanel({visible: false, item: this});
 		atom.commands.add(this.inputField.element, {
 			"core:confirm": () => this.confirm(this.input),
@@ -101,6 +101,27 @@ class PromptView{
 		
 		Object.assign(this, opts);
 		return this;
+	}
+	
+	
+	/**
+	 * Normalise a value expected to provide instance properties.
+	 *
+	 * Strings are treated as shorthand for setting `headerText`;
+	 * objects are returned unmodified. Other types are invalid.
+	 *
+	 * @example view.normaliseProps("Title") == {headerText: "Title"};
+	 * @throws {TypeError} If input isn't an object or string
+	 * @param {*} input
+	 * @return {Object}
+	 */
+	normaliseProps(input){
+		switch(typeof input){
+			case "string": return {headerText: input};
+			case "object": return input;
+		}
+		const message = `Object or string expected when ${typeof input} given`;
+		throw new TypeError(message);
 	}
 	
 	

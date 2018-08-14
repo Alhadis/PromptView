@@ -16,69 +16,98 @@ describe("PromptView", () => {
 	});
 	
 	when("constructed", () => {
-		it("keeps the view hidden", () => {
-			const prompt = new PromptView();
-			expect(prompt.element).to.exist.and.not.be.drawn;
-		});
+		let prompt = null;
+		before(() => prompt = new PromptView());
 		
-		it("creates a wrapper element", () => {
-			const prompt = new PromptView();
-			expect(prompt.element).to.exist;
-			prompt.element.should.be.an.instanceOf(HTMLElement);
-			prompt.element.should.have.class("prompt");
-			prompt.element.tagName.should.equal("DIV");
-		});
+		it("keeps the view hidden", () =>
+			expect(prompt.element).to.exist.and.not.be.drawn);
 		
-		it("creates header and footer elements", () => {
-			const prompt = new PromptView({
-				headerHTML: "<b>Header</b>",
-				footerHTML: "<i>Footer</i>",
+		when("initialised with an object argument", () => {
+			it("sets header and footer text", () => {
+				const prompt = new PromptView({
+					headerHTML: "<b>Header</b>",
+					footerHTML: "<i>Footer</i>",
+				});
+				prompt.headerElement.textContent.should.equal("Header");
+				prompt.headerElement.innerHTML.should.equal("<b>Header</b>");
+				prompt.footerElement.textContent.should.equal("Footer");
+				prompt.footerElement.innerHTML.should.equal("<i>Footer</i>");
 			});
-			expect(prompt.headerElement).to.exist;
-			prompt.headerElement.should.be.an.instanceOf(HTMLElement);
-			prompt.headerElement.should.have.class("prompt-header");
-			prompt.headerElement.tagName.should.equal("HEADER");
-			prompt.headerElement.textContent.should.equal("Header");
-			prompt.headerElement.innerHTML.should.equal("<b>Header</b>");
+
+			it("sets element classes", () => {
+				const prompt = new PromptView({
+					elementClass: "popup",
+					headerClass:  "popup-head",
+					footerClass:  "popup-foot",
+				});
+				prompt.element.should.have.class("popup").and.not.have.class("prompt");
+				prompt.headerElement.should.have.class("popup-head").and.not.have.class("prompt-header");
+				prompt.footerElement.should.have.class("popup-foot").and.not.have.class("prompt-footer");
+			});
+
+			it("lets tag-types be specified", () => {
+				const prompt = new PromptView({
+					elementTagName: "details",
+					headerTagName: "legend",
+					footerTagName: "div",
+				});
+				prompt.element.should.be.an.instanceOf(HTMLDetailsElement);
+				prompt.element.tagName.should.equal("DETAILS");
+				prompt.headerElement.should.be.an.instanceOf(HTMLLegendElement);
+				prompt.footerElement.should.be.an.instanceOf(HTMLDivElement);
+				prompt.headerElement.tagName.should.equal("LEGEND");
+				prompt.footerElement.tagName.should.equal("DIV");
+			});
+
+			it("stores unrecognised options as instance properties", () => {
+				const bar = {};
+				const prompt = new PromptView({foo: bar});
+				prompt.should.have.property("foo").that.equals(bar);
+			});
+		});
+		
+		when("initialised when a string argument", () =>
+			it("treats it as shorthand for setting headerText", () => {
+				const prompt = new PromptView("Header");
+				prompt.headerElement.textContent.should.equal("Header");
+				prompt.headerElement.innerHTML.should.equal("Header");
+				prompt.footerElement.textContent.should.equal("");
+				prompt.footerElement.innerHTML.should.equal("");
+				prompt.headerHTML = "<b>Foo</b>";
+				prompt.headerElement.textContent.should.equal("Foo");
+			}));
+
+		when("initialised when no arguments", () => {
+			it('defaults to <div class="prompt"> as its container', () => {
+				prompt.element.should.be.an.instanceOf(HTMLElement);
+				prompt.element.tagName.should.equal("DIV");
+				prompt.element.className.should.equal("prompt");
+			});
 			
-			expect(prompt.footerElement).to.exist;
-			prompt.footerElement.should.be.an.instanceOf(HTMLElement);
-			prompt.footerElement.should.have.class("prompt-footer");
-			prompt.footerElement.tagName.should.equal("FOOTER");
-			prompt.footerElement.textContent.should.equal("Footer");
-			prompt.footerElement.innerHTML.should.equal("<i>Footer</i>");
-		});
-		
-		it("sets initial element classes", () => {
-			const prompt = new PromptView({
-				elementClass: "popup",
-				headerClass:  "popup-head",
-				footerClass:  "popup-foot",
+			it('defaults to <header class="prompt-header"> as its header', () => {
+				expect(prompt.headerElement).to.exist;
+				prompt.headerElement.should.be.an.instanceOf(HTMLElement);
+				prompt.headerElement.tagName.should.equal("HEADER");
+				prompt.headerElement.className.should.equal("prompt-header");
+				prompt.element.contains(prompt.headerElement).should.be.true;
+				prompt.element.firstChild.should.equal(prompt.headerElement);
 			});
-			prompt.element.should.have.class("popup").and.not.have.class("prompt");
-			prompt.headerElement.should.have.class("popup-head").and.not.have.class("prompt-header");
-			prompt.footerElement.should.have.class("popup-foot").and.not.have.class("prompt-footer");
-		});
-		
-		it("lets element tag-types be overridden", () => {
-			const prompt = new PromptView({
-				elementTagName: "details",
-				headerTagName: "legend",
-				footerTagName: "div",
+			
+			it('defaults to <footer class="prompt-footer"> as its footer', () => {
+				expect(prompt.footerElement).to.exist;
+				prompt.footerElement.should.be.an.instanceOf(HTMLElement);
+				prompt.footerElement.tagName.should.equal("FOOTER");
+				prompt.footerElement.className.should.equal("prompt-footer");
+				prompt.element.contains(prompt.footerElement).should.be.true;
+				prompt.element.lastChild.should.equal(prompt.footerElement);
 			});
-			prompt.element.should.be.an.instanceOf(HTMLDetailsElement);
-			prompt.element.tagName.should.equal("DETAILS");
-			prompt.headerElement.should.be.an.instanceOf(HTMLLegendElement);
-			prompt.footerElement.should.be.an.instanceOf(HTMLDivElement);
-			prompt.headerElement.tagName.should.equal("LEGEND");
-			prompt.footerElement.tagName.should.equal("DIV");
 		});
-		
-		it("stores unrecognised options as instance properties", () => {
-			const bar = {};
-			const prompt = new PromptView({foo: bar});
-			prompt.should.have.property("foo").that.equals(bar);
-		});
+
+		when("initialised with any other type of argument", () =>
+			it("throws an error", () => {
+				expect(() => new PromptView(true)).to.throw("Object or string expected when boolean given");
+				expect(() => new PromptView(42.8)).to.throw("Object or string expected when number given");
+			}));
 		
 		it("lets properties be modified after construction", () => {
 			const prompt = new PromptView();
