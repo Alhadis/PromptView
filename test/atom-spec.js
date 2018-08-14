@@ -296,4 +296,59 @@ describe("PromptView", () => {
 			});
 		});
 	});
+	
+	when("autoFocus is disabled", () => {
+		let originallyActive = null;
+		let tempInput = null;
+		
+		before(() => {
+			tempInput = document.createElement("input");
+			tempInput.type = "text";
+			document.body.appendChild(tempInput);
+			tempInput.focus();
+		});
+		
+		after(() => document.body.removeChild(tempInput));
+		
+		when("displayed", () =>
+			it("doesn't change focus", () => {
+				prompt = new PromptView({autoFocus: false});
+				prompt.autoFocus.should.be.false;
+				prompt.promptUser();
+				prompt.element.should.be.drawn;
+				prompt.element.contains(document.activeElement).should.be.false;
+				document.activeElement.should.equal(tempInput);
+			}));
+		
+		when("confirmed", () =>
+			it("doesn't restore focus", async () => {
+				prompt.inputField.element.focus();
+				prompt.element.contains(document.activeElement).should.be.true;
+				prompt.input = "ABC XYZ";
+				confirm(prompt.inputField.element);
+				await delay(50);
+				document.activeElement.should.not.equal(tempInput);
+			}));
+		
+		when("autoFocus is disabled while prompting", () =>
+			it("it doesn't restore focus", async () => {
+				tempInput.focus();
+				prompt = new PromptView();
+				prompt.autoFocus.should.be.true;
+				prompt.promptUser();
+				prompt.should.have.property("previouslyFocussedElement").that.equals(tempInput);
+				prompt.element.should.be.drawn;
+				prompt.element.contains(document.activeElement).should.be.true;
+				
+				prompt.autoFocus = false;
+				prompt.autoFocus.should.be.false;
+				expect(prompt.previouslyFocussedElement).to.be.null;
+				prompt.input = "ABC XYZ";
+				confirm(prompt.inputField.element);
+				await delay(50);
+				prompt.element.should.not.be.drawn;
+				prompt.element.contains(document.activeElement).should.be.false;
+				document.activeElement.should.not.equal(tempInput);
+			}));
+	});
 });
