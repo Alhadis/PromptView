@@ -288,6 +288,17 @@ class PromptView{
 	
 	/**
 	 * @readonly
+	 * @property {Boolean} [isPending=false]
+	 * @description Whether the view is waiting for user to confirm their input.
+	 */
+	get isPending(){
+		const prompt = currentPrompts.get(this);
+		return !!(prompt && prompt.promise instanceof Promise);
+	}
+	
+	
+	/**
+	 * @readonly
 	 * @property {String} [elementTagName="div"]
 	 * @description Name of the HTML tag used to create {@link #headerElement}.
 	 * This property can only be set during construction, using the original

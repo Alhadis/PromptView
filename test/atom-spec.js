@@ -149,6 +149,9 @@ describe("PromptView", () => {
 		it("shifts focus to the input field", () =>
 			prompt.element.contains(document.activeElement).should.be.true);
 		
+		it("marks it as pending", () =>
+			prompt.should.have.property("isPending").that.equals(true));
+		
 		it("updates header and footer text", () => {
 			prompt.headerText.should.equal("Enter a number");
 			prompt.footerText.should.equal("Just type 42.");
