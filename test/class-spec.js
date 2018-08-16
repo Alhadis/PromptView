@@ -58,6 +58,11 @@ describe("PromptView", () => {
 				prompt.headerElement.tagName.should.equal("LEGEND");
 				prompt.footerElement.tagName.should.equal("DIV");
 			});
+			
+			it("sets placeholder text", () => {
+				const prompt = new PromptView({placeholder: "ABC"});
+				prompt.placeholder.should.equal("ABC");
+			});
 
 			it("stores unrecognised options as instance properties", () => {
 				const bar = {};
@@ -101,6 +106,9 @@ describe("PromptView", () => {
 				prompt.element.contains(prompt.footerElement).should.be.true;
 				prompt.element.lastChild.should.equal(prompt.footerElement);
 			});
+			
+			it("defaults to the empty string as its placeholder text", () =>
+				prompt.placeholder.should.equal(""));
 		});
 
 		when("initialised with any other type of argument", () =>
@@ -115,10 +123,32 @@ describe("PromptView", () => {
 			prompt.footerText = "Footer";
 			prompt.headerClass = "header-thing";
 			prompt.footerClass = "footer-thing";
+			prompt.placeholder = "Enter something";
 			prompt.headerElement.textContent.should.equal("Header");
 			prompt.footerElement.textContent.should.equal("Footer");
 			prompt.headerElement.should.have.class("header-thing");
 			prompt.footerElement.should.have.class("footer-thing");
+			prompt.placeholder.should.equal("Enter something");
+		});
+		
+		it("lets properties be cleared after construction", () => {
+			const prompt = new PromptView({
+				headerText: "Header",
+				footerText: "Footer",
+				headerClass: "header-thing",
+				footerClass: "footer-thing",
+				placeholder: "Enter something",
+			});
+			prompt.headerText = "";
+			prompt.footerText = "";
+			prompt.headerClass = "";
+			prompt.footerClass = "";
+			prompt.placeholder = "";
+			prompt.headerElement.textContent.should.equal("");
+			prompt.footerElement.textContent.should.equal("");
+			prompt.headerElement.className.should.equal("");
+			prompt.footerElement.className.should.equal("");
+			prompt.placeholder.should.equal("");
 		});
 	});
 	
@@ -142,6 +172,7 @@ describe("PromptView", () => {
 				elementClass: "calc-prompt",
 				headerClass: "calc-header",
 				footerClass: "calc-footer",
+				placeholder: "Any number.",
 			}).then(value => answer = value);
 			prompt.element.should.be.drawn;
 		});
@@ -163,6 +194,9 @@ describe("PromptView", () => {
 			prompt.headerElement.should.have.class("calc-header");
 			prompt.footerElement.should.have.class("calc-footer");
 		});
+		
+		it("updates placeholder text", () =>
+			prompt.placeholder.should.equal("Any number."));
 	});
 	
 	when("the user responds", () => {
@@ -181,6 +215,9 @@ describe("PromptView", () => {
 		
 		it("restores focus to the previously-active element", () =>
 			prompt.element.contains(document.activeElement).should.be.false);
+		
+		it("retains its placeholder text", () =>
+			prompt.placeholder.should.equal("Any number."));
 	});
 	
 	when("rerunning the prompt", () => {

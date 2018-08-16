@@ -441,6 +441,21 @@ class PromptView{
 		const prompt = currentPrompts.get(this);
 		return !!(prompt && prompt.promise instanceof Promise);
 	}
+	
+	
+	/**
+	 * @property {String} [placeholder=""]
+	 * @description Placeholder text displayed by {@link #inputField} when empty.
+	 */
+	get placeholder(){
+		return this.inputField
+			? this.inputField.getPlaceholderText() || ""
+			: "";
+	}
+	set placeholder(to){
+		if(this.inputField)
+			this.inputField.setPlaceholderText(to);
+	}
 }
 
 
