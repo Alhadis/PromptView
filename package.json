@@ -7,6 +7,6 @@
 	"author": "John Gardner <gardnerjohng@gmail.com>",
 	"atomTestRunner": "atom-mocha",
 	"devDependencies": {
-		"atom-mocha": "^2.0.5"
+		"atom-mocha": "^2.0.6"
 	}
 }
