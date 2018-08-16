@@ -232,22 +232,6 @@ class PromptView{
 	
 	
 	/**
-	 * @property {String} input
-	 * @description Text currently entered into the instance's {@link #inputField}.
-	 * Writing to this property will replace whatever text has been entered in the field.
-	 */
-	get input(){
-		return this.inputField
-			? this.inputField.getText()
-			: "";
-	}
-	set input(to){
-		if(this.inputField)
-			this.inputField.setText(to);
-	}
-	
-	
-	/**
 	 * @property {Boolean} [autoFocus=true]
 	 * @description Set and restore focus when toggling prompt.
 	 */
@@ -283,17 +267,6 @@ class PromptView{
 				data.autoHideHandler = null;
 				break;
 		}
-	}
-	
-	
-	/**
-	 * @readonly
-	 * @property {Boolean} [isPending=false]
-	 * @description Whether the view is waiting for user to confirm their input.
-	 */
-	get isPending(){
-		const prompt = currentPrompts.get(this);
-		return !!(prompt && prompt.promise instanceof Promise);
 	}
 	
 	
@@ -440,6 +413,33 @@ class PromptView{
 	set footerHTML(to){
 		if(this.footerElement)
 			this.footerElement.innerHTML = to;
+	}
+	
+	
+	/**
+	 * @property {String} input
+	 * @description Text currently entered into the instance's {@link #inputField}.
+	 * Writing to this property will replace whatever text has been entered in the field.
+	 */
+	get input(){
+		return this.inputField
+			? this.inputField.getText()
+			: "";
+	}
+	set input(to){
+		if(this.inputField)
+			this.inputField.setText(to);
+	}
+	
+	
+	/**
+	 * @readonly
+	 * @property {Boolean} [isPending=false]
+	 * @description Whether the view is waiting for user to confirm their input.
+	 */
+	get isPending(){
+		const prompt = currentPrompts.get(this);
+		return !!(prompt && prompt.promise instanceof Promise);
 	}
 }
 
