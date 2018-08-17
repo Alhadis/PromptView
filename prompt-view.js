@@ -1,6 +1,6 @@
 "use strict";
 
-const {TextEditor} = require("atom");
+const atom = "object" === typeof global && global.atom;
 const currentPrompts = new WeakMap();
 const internalValues = new WeakMap();
 
@@ -26,11 +26,13 @@ class PromptView{
 		
 		// Setup DOM
 		this.buildTree(opts = this.normaliseProps(opts));
-		this.panel = atom.workspace.addModalPanel({visible: false, item: this});
-		atom.commands.add(this.inputField.element, {
-			"core:confirm": () => this.confirm(this.input),
-			"core:cancel":  () => this.confirm(null),
-		});
+		if(atom){
+			this.panel = atom.workspace.addModalPanel({visible: false, item: this});
+			atom.commands.add(this.inputField.element, {
+				"core:confirm": () => this.confirm(this.input),
+				"core:cancel":  () => this.confirm(null),
+			});
+		}
 		
 		// Assign initial property values
 		this.assignProps({
@@ -44,7 +46,8 @@ class PromptView{
 	
 	/**
 	 * Construct the elements which compose the {@link PromptView}'s modal dialogue.
-	 * 
+	 *
+	 * @param {Object} [opts={}]
 	 * @returns {PromptView} Reference to the calling instance
 	 * @internal
 	 */
@@ -63,7 +66,7 @@ class PromptView{
 		 * @description Content block displayed above {@link #inputField}, empty unless
 		 * {@link headerText} or {@link headerHTML} has been assigned content.
 		 *
-		 * @property {TextEditor} inputField
+		 * @property {TextEditor|HTMLFormElement} inputField
 		 * @description Miniature editing bar where user types their input.
 		 * 
 		 * @property {HTMLElement} footerElement
@@ -74,13 +77,60 @@ class PromptView{
 		this.element       = document.createElement(elementTagName);
 		this.headerElement = document.createElement(headerTagName);
 		this.footerElement = document.createElement(footerTagName);
-		this.inputField    = new TextEditor({mini: true, softTabs: false});
+		this.inputField    = atom
+			? atom.workspace.buildTextEditor({mini: true, softTabs: false})
+			: this.buildFakeEditor();
 		this.element.append(...[
 			this.headerElement,
 			this.inputField.element,
 			this.footerElement,
 		]);
 		return this;
+	}
+	
+	
+	/**
+	 * Construct a synthetic {@link TextEditor} component for browser environments.
+	 *
+	 * @param {Object} [opts={}]
+	 * @return {HTMLFormElement}
+	 * @internal
+	 */
+	buildFakeEditor(opts = {}){
+		
+		// Entry field
+		const input = document.createElement("input");
+		Object.assign(input, {
+			autofocus:   opts.autoFocus,
+			placeholder: opts.placeholder,
+			value:       opts.input,
+			type:        "text",
+		});
+		
+		// Surrogate editor component
+		const form = Object.assign(document.createElement("form"), {
+			element: form.appendChild(input),
+			getText: () => input.value,
+			setText: to => input.value = to,
+			getPlaceholderText: () => input.placeholder,
+			setPlaceholderText: to => input.placeholder = to,
+		});
+		
+		// Confirmation handler
+		form.addEventListener("submit", event => {
+			this.confirm(input.value);
+			event.preventDefault();
+		});
+		
+		// Special handling for <dialog> tags if author's using one
+		if("dialog" === opts.elementTagName){
+			form.method = "dialog";
+			this.panel = {
+				show: () => form.show(),
+				hide: () => form.close(),
+			};
+		}
+		return form;
 	}
 	
 	
@@ -227,7 +277,7 @@ class PromptView{
 		this.previouslyFocussedElement = null;
 		(el && document.documentElement.contains(el))
 			? el.focus()
-			: atom.workspace.element.focus();
+			: atom && atom.workspace.element.focus();
 	}
 	
 	
