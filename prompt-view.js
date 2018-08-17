@@ -1,9 +1,134 @@
 "use strict";
 
-const {TextEditor} = require("atom");
+/**
+ * @constant {Boolean} IS_CJS_LIKE
+ * @summary Does the current environment use CommonJS-style modules? (Node.js, Atom/Electron)
+ */
+const IS_CJS_LIKE =
+	"object"   === typeof module &&
+	"object"   === typeof module.exports &&
+	"function" === typeof require;
+
+/**
+ * @constant {Boolean} IS_ATOM
+ * @summary Are we running in Atom?
+ */
+const IS_ATOM =
+	IS_CJS_LIKE &&
+	"object"   === typeof atom &&
+	"object"   === typeof atom.workspace &&
+	"function" === typeof atom.workspace.buildTextEditor;
+
+/**
+ * @constant {Boolean} IS_BROWSER
+ * @summary Are we running inside a normal browser? (Electron environments omitted)
+ */
+const IS_BROWSER =
+	!IS_ATOM &&
+	"object"   === typeof window &&
+	"object"   === typeof document &&
+	"function" === typeof document.createElement &&
+	window.document === document;
+
+
+
+/**
+ * @readonly
+ * @enum {String}
+ * @description Method of implementation tailored to the running environment.
+ */
+const PromptViewStyle = {
+	
+	/**
+	 * @constant {String} AUTO
+	 * @summary
+	 *    Auto-detect the most appropriate method for the current environment.
+	 *
+	 * @description
+	 *    For Atom projects, this means {@link #ATOM}. For browsers, {@link #DIALOG},
+	 *    {@link #CUSTOM} and {@link #PLAIN_HTML} elements are used, in descending
+	 *    order of preference.
+	 *
+	 *    NOTE: Styling will *not* be provided, irrespective of method. Atom themes
+	 *    already provide styling for dialog windows; authors of browser-based apps
+	 *    are analogously expected to provide their own component styling.
+	 * @readonly
+	 */
+	AUTO: "auto",
+	
+	/**
+	 * @constant {String} ATOM
+	 * @summary
+	 *    Create and register a modal dialogue window for an Atom workspace.
+	 *
+	 * @description
+	 *    The prompt's {@link PromptView#inputField|inputField} is set to a
+	 *    {@link TextEditor} instance created using {@link atom.workspace.buildTextEditor};
+	 *    the physical `<input>` element is accessible via `.inputField.element`.
+	 * @readonly
+	 */
+	ATOM: "atom",
+	
+	/**
+	 * @constant {String} CUSTOM
+	 * @summary
+	 *    Register and create a custom `<prompt-view>` element.
+	 *
+	 * @description
+	 *    An alternative name may be specified during construction by setting the
+	 *    `elementTagName` parameter. The generated sub-tree is otherwise similar
+	 *    to the one produced by {@link #ATOM}. Authors requiring finer control
+	 *    than this are encouraged to override {@link PromptView#buildTree} in a
+	 *    subclass, or dynamically modify the prompt's contents post-construction.
+	 * @readonly
+	 */
+	CUSTOM: "custom",
+	
+	/**
+	 * @constant {String} DIALOG
+	 * @summary
+	 *    Create an HTML5.2 `<dialog>` using `<form method="dialog">` as its `inputField`.
+	 *
+	 * @description
+	 *    Any `elementTagName` parameter that may be present is ignored. Atom-specific
+	 *    {@link TextEditor} properties used by {@link PromptView} are synthesised so
+	 *    that code authored for Atom environments will transparently work in browsers.
+	 * @see {@link PromptView#synthesiseAtomEditor}
+	 * @readonly
+	 */
+	DIALOG: "dialog",
+	
+	/**
+	 * @constant {String} PLAIN_HTML
+	 * @summary
+	 *    Use ordinary HTML elements to construct the sub-tree.
+	 *
+	 * @description
+	 *    The tag-types used are the same as those used by {@link #ATOM}; a `<form>`
+	 *    element serves as the prompt's `inputField` property. Atom-related properties
+	 *    are synthesised in the manner detailed under {@link #DIALOG}.
+	 * @readonly
+	 */
+	PLAIN_HTML: "plain-html",
+	
+	/**
+	 * @constant {String} NATIVE
+	 * @summary
+	 *    Use {@link window.prompt} to synchronously prompt for input.
+	 *
+	 * @description
+	 *    Dialogues are displayed using the host platform's native dialogue window.
+	 *    Authors should avoid this method, even as a fallback. It exists mainly to
+	 *    benefit assistive technologies and non-graphical browsers, where native
+	 *    dialogues may be an acceptable alternative to a scripted component.
+	 * @readonly
+	 */
+	NATIVE: "native",
+};
+
+
 const currentPrompts = new WeakMap();
 const internalValues = new WeakMap();
-
 
 /**
  * Modal dialogue for asynchronously prompting users for their input.
@@ -22,6 +147,7 @@ class PromptView{
 			autoFocus: true,
 			autoHide: false,
 			autoHideHandler: null,
+			style: "auto",
 		});
 		
 		// Setup DOM
@@ -98,6 +224,7 @@ class PromptView{
 		delete opts.elementTagName;
 		delete opts.headerTagName;
 		delete opts.footerTagName;
+		delete opts.style;
 		
 		Object.assign(this, opts);
 		return this;
@@ -456,7 +583,25 @@ class PromptView{
 		if(this.inputField)
 			this.inputField.setPlaceholderText(to);
 	}
+	
+	
+	/**
+	 * @readonly
+	 * @property {PromptViewStyle} [style="auto"]
+	 * @description The implementation method used to construct the prompt-view.
+	 * Acceptable keywords are listed under {@link PromptViewStyle}; if `"auto"`
+	 * or empty, the class uses the method most appropriate for the environment.
+	 */
+	get style(){
+		return internalValues.get(this).style || "auto";
+	}
 }
 
 
-module.exports = PromptView;
+// CommonJS/Node.js
+if(IS_CJS_LIKE)
+	module.exports.PromptView = PromptView;
+
+// Browser export
+else if(IS_BROWSER)
+	window.PromptView = PromptView;
