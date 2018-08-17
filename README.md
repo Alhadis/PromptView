@@ -9,6 +9,5 @@ Lightweight dialogue component for prompting user input.
 TODO
 ----
 * [X] Implement placeholder setting
-* [ ] Support browser environments using HTML5 `dialog` and/or custom-elements
 * [ ] Document class properties
 * [ ] Publish to NPM
