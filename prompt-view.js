@@ -509,4 +509,10 @@ class PromptView{
 }
 
 
-module.exports = PromptView;
+// Node.js or another CommonJS-like system
+if("object" === typeof module && "object" === typeof module.exports)
+	module.exports = PromptView;
+
+// Browser export
+else if("object" === typeof window && window instanceof window.Window)
+	window.PromptView = PromptView;
