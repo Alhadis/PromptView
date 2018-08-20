@@ -994,7 +994,7 @@ class PromptView{
 		const el = this.previouslyFocussedElement;
 		this.previouslyFocussedElement = null;
 		if(el && document.documentElement.contains(el))
-			el.focus()
+			el.focus();
 		else atom
 			? atom.workspace.element.focus()
 			: document.body.focus();
@@ -1626,7 +1626,6 @@ describe("PromptView", () => {
 	});
 	
 	when("autoFocus is disabled", () => {
-		let originallyActive = null;
 		let tempInput = null;
 		
 		before(() => {

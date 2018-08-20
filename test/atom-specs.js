@@ -385,7 +385,6 @@ describe("PromptView", () => {
 	});
 	
 	when("autoFocus is disabled", () => {
-		let originallyActive = null;
 		let tempInput = null;
 		
 		before(() => {

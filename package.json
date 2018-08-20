@@ -8,6 +8,7 @@
 	"atomTestRunner": "atom-mocha",
 	"devDependencies": {
 		"atom-mocha": "^2.0.6",
-		"browserify": "^16.2.2"
+		"browserify": "^16.2.2",
+		"eslint": "^5.4.0"
 	}
 }
