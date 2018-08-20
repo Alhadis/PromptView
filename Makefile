@@ -1,9 +1,10 @@
 all: lint browser-specs test
 
-lint:; eslint .
-test:; atom -t test
+lint:;  eslint .
+test:;  atom -t test
+clean:; rm -f *.tgz *.tar *.tar.gz
 
-.PHONY: lint test
+.PHONY: lint test clean
 
 
 SRC = prompt-view.js test/atom-specs.js test/utils.js
