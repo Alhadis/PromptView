@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="initial-scale=1, minimum-scale=1" />
+<title>PromptView Browser Tests</title>
+<link href="../../node_modules/mocha/mocha.css" rel="stylesheet"/>
+</head>
+
+
+<body>
+	
+	<!-- Load and setup Mocha/Chai -->
+	<div id="mocha"></div>
+	<script src="../../node_modules/chai/chai.js"></script>
+	<script src="../../node_modules/mocha/mocha.js"></script>
+	<script>mocha.setup("bdd");</script>
+	
+	<script src="./bundled-spec.js"></script>
+	<script>
+		"use strict";
+		mocha.checkLeaks();
+		mocha.run();
+	</script>
+	
+</body>
+</html>

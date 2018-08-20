@@ -9,11 +9,13 @@ describe("PromptView", () => {
 	const PromptView = require("../prompt-view.js");
 	
 	let paneEditor = null;
-	before("Setting up workspace", async () => {
-		attachToDOM(atom.workspace.getElement());
-		paneEditor = await atom.workspace.open();
-		paneEditor.element.focus();
-	});
+	if(atom){
+		before("Setting up workspace", async () => {
+			attachToDOM(atom.workspace.getElement());
+			paneEditor = await atom.workspace.open();
+			paneEditor.element.focus();
+		});
+	}
 	
 	when("constructed", () => {
 		let prompt = null;
