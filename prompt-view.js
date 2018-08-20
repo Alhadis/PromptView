@@ -33,6 +33,12 @@ class PromptView{
 				"core:cancel":  () => this.confirm(null),
 			});
 		}
+		else this.inputField.element.addEventListener("keydown", event => {
+			switch(event.keyCode){
+				case 13: this.confirm(this.input); break;
+				case 27: this.confirm(null);       break;
+			}
+		});
 		
 		// Assign initial property values
 		this.assignProps({
@@ -77,14 +83,19 @@ class PromptView{
 		this.element       = document.createElement(elementTagName);
 		this.headerElement = document.createElement(headerTagName);
 		this.footerElement = document.createElement(footerTagName);
-		this.inputField    = atom
-			? atom.workspace.buildTextEditor({mini: true, softTabs: false})
-			: this.buildFakeEditor();
-		this.element.append(...[
-			this.headerElement,
-			this.inputField.element,
-			this.footerElement,
-		]);
+		this.element.append(this.headerElement, this.footerElement);
+		
+		if(atom){
+			this.inputField = atom.workspace.buildTextEditor({mini: true, softTabs: false});
+			this.element.insertBefore(this.inputField.element, this.footerElement);
+		}
+		else{
+			this.inputField = this.buildFakeEditor();
+			this.element.insertBefore(this.inputField, this.footerElement);
+			this.element.hidden = "dialog" !== this.elementTagName;
+			document.body.appendChild(this.element);
+		}
+		
 		return this;
 	}
 	
@@ -111,12 +122,21 @@ class PromptView{
 			getPlaceholderText: () => input.placeholder,
 			setPlaceholderText: to => input.placeholder = to,
 		});
-		
-		// Confirmation handler
-		form.addEventListener("submit", event => {
-			this.confirm(input.value);
-			event.preventDefault();
+
+		// Hidden submission button
+		const submit = document.createElement("input");
+		Object.assign(form.appendChild(submit), {
+			type: "submit",
+			value: "Confirm",
+			hidden: true,
 		});
+		
+		// Confirmation handlers
+		for(const el of [input, form])
+			el.addEventListener("submit", event => {
+				this.confirm(input.value);
+				event.preventDefault();
+			});
 		
 		// Special handling for <dialog> tags if author's using one
 		if("dialog" === opts.elementTagName){
@@ -126,12 +146,6 @@ class PromptView{
 				hide: () => form.close(),
 			};
 		}
-		// Otherwise, append to page's <body> element
-		else{
-			this.element.hidden = true;
-			document.body.appendChild(this.element);
-		}
-		
 		return form;
 	}
 	

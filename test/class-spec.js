@@ -9,13 +9,29 @@ describe("PromptView", () => {
 	const PromptView = require("../prompt-view.js");
 	
 	let paneEditor = null;
-	if(atom){
-		before("Setting up workspace", async () => {
+	before("Setting up workspace", async () => {
+		if(atom){
 			attachToDOM(atom.workspace.getElement());
 			paneEditor = await atom.workspace.open();
 			paneEditor.element.focus();
-		});
-	}
+		}
+		else{
+			// Make a bogus TextEditor/pane item
+			const element = document.createElement("textarea");
+			element.resize = false;
+			Object.assign(element.style, {
+				position: "fixed",
+				opacity: 0,
+				right:   0,
+				bottom:  0,
+				height: "10px",
+				width:  "10px",
+			});
+			const component = {get focused(){ return document.activeElement === element; }};
+			paneEditor = {element, component};
+			document.body.appendChild(element);
+		}
+	});
 	
 	when("constructed", () => {
 		let prompt = null;

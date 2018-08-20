@@ -8,26 +8,15 @@ module.exports = {
 	},
 
 	confirm(el){
-		return "object" === typeof atom
-			? atom.commands.dispatch(el, "core:confirm")
-			: forceFormSubmission(el);
+		if("object" === typeof atom)
+			return atom.commands.dispatch(el, "core:confirm");
+		el.dispatchEvent(new KeyboardEvent("keydown", {keyCode: 13}));
 	},
 
 	cancel(el){
 		if("object" === typeof atom)
 			return atom.commands.dispatch(el, "core:cancel");
 		el.value = "";
-		forceFormSubmission(el);
+		el.dispatchEvent(new KeyboardEvent("keydown", {keyCode: 27}));
 	},
 };
-
-function forceFormSubmission(el){
-	let form;
-	if(el instanceof HTMLFormElement)
-		el.submit();
-	if((form = el.form) && (form instanceof HTMLFormElement))
-		form.submit();
-	else if(form = el.closest("form"))
-		form.submit();
-	else console.error("Could not locate nearest form to submit!");
-}
