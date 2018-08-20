@@ -240,8 +240,10 @@ class PromptView{
 	 */
 	show(){
 		this.autoFocus && this.saveFocus();
-		this.panel
-			? this.panel.show()
+		if(atom && this.panel)
+			this.panel.show();
+		else ("dialog" === this.elementTagName)
+			? this.element.show()
 			: this.element.hidden = false;
 		this.autoFocus && this.inputField.element.focus();
 	}
@@ -252,8 +254,10 @@ class PromptView{
 	 * @internal
 	 */
 	hide(){
-		this.panel
-			? this.panel.hide()
+		if(atom && this.panel)
+			this.panel.hide();
+		else ("dialog" === this.elementTagName)
+			? this.element.close()
 			: this.element.hidden = true;
 		this.autoFocus && this.restoreFocus();
 	}
@@ -277,9 +281,11 @@ class PromptView{
 	restoreFocus(){
 		const el = this.previouslyFocussedElement;
 		this.previouslyFocussedElement = null;
-		(el && document.documentElement.contains(el))
-			? el.focus()
-			: atom && atom.workspace.element.focus();
+		if(el && document.documentElement.contains(el))
+			el.focus()
+		else atom
+			? atom.workspace.element.focus()
+			: document.body.focus();
 	}
 	
 	
