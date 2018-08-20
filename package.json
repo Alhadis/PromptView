@@ -1,6 +1,7 @@
 {
 	"name": "prompt-view",
 	"version": "v0.0.0",
+	"license": "ISC",
 	"main": "prompt-view.js",
 	"description": "Modal dialogue for asynchronously prompting users for their input.",
 	"repository": "https://github.com/Alhadis/PromptView",
