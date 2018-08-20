@@ -100,15 +100,11 @@ class PromptView{
 		
 		// Entry field
 		const input = document.createElement("input");
-		Object.assign(input, {
-			autofocus:   opts.autoFocus,
-			placeholder: opts.placeholder,
-			value:       opts.input,
-			type:        "text",
-		});
+		input.type = "text";
 		
 		// Surrogate editor component
-		const form = Object.assign(document.createElement("form"), {
+		const form = document.createElement("form");
+		Object.assign(form, {
 			element: form.appendChild(input),
 			getText: () => input.value,
 			setText: to => input.value = to,
@@ -130,6 +126,12 @@ class PromptView{
 				hide: () => form.close(),
 			};
 		}
+		// Otherwise, append to page's <body> element
+		else{
+			this.element.hidden = true;
+			document.body.appendChild(this.element);
+		}
+		
 		return form;
 	}
 	
