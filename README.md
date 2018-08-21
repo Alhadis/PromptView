@@ -60,17 +60,51 @@ Although this component was written with [Atom][] projects in mind, it works in 
 
 
 
+Instance properties
+-------------------
+The full list of supported properties are:
+
+<!----------------------------------------------------------------------------------------------------------------------------->
+| Name            | Type                                    | Default            | Description
+|-----------------|-----------------------------------------|--------------------|----------------------------------------------
+| autoFocus       | [`Boolean`][]                           | `true`             | Set and restore focus when toggling prompt.
+| autoHide        | [`Boolean`][]                           | `true`             | Hide the prompt upon losing focus.
+| element         | [`HTMLElement`][]                       |                    | Top-level wrapper representing the `PromptView` in Atom's workspace.
+| elementClass    | [`String`][]                            | `"prompt"`         | Space-separated list of CSS classes assigned to the instance's `element`.
+| elementTagName  | [`String`][]                            | `"div"`            | Name of the HTML tag used to create `element`. This property can only be set during construction, using the original option-hash passed to the constructor function.
+| footerClass     | [`String`][]                            | `"prompt-footer"`  | Space-separated list of CSS classes assigned to instance's `footer`.
+| footerElement   | [`HTMLElement`][]                       |                    | Content block displayed below `inputField`, empty unless `headerText` or `headerHTML` have been set.
+| footerHTML      | [`String`][]                            | `""`               | HTML representation of the `footerElement`'s contents.
+| footerTagName   | [`String`][]                            | `"footer"`         | Name of the HTML tag used to create `footerElement`. This property can only be set during construction using the original option-hash passed to the constructor function.
+| footerText      | [`String`][]                            | `""`               | A plain-text representation of the `footerElement`'s content.
+| headerClass     | [`String`][]                            | `"prompt-header"`  | Space-separated list of CSS classes assigned to instance's `headerElement`.
+| headerElement   | [`HTMLElement`][]                       |                    | Content block displayed above `inputField`, empty unless `headerText` or `headerHTML` have been set.
+| headerHTML      | [`String`][]                            | `""`               | HTML representation of the `headerElement`'s content.
+| headerTagName   | [`String`][]                            | `"header"`         | Name of the HTML tag used to create `headerElement`. This property can only be set during construction, using the original option-hash passed to the constructor function.
+| headerText      | [`String`][]                            | `""`               | A plain-text representation of the `headerElement`'s content.
+| input           | [`String`][]                            | `""`               | Text currently entered into the instance's `inputField`. Writing to this property will replace whatever text has been entered in the field.
+| inputField      | [`TextEditor`][], [`HTMLFormElement`][] |                    | Miniature editing bar where user types their input. 
+| isPending       | [`Boolean`][]                           | `false`            | Whether the view is waiting for user to confirm their input.
+| placeholder     | [`String`][]                            | `""`               | Placeholder text displayed by `inputField` when empty.
+<!------------------------------------------------------------------------------------------------------------------------------>
+
+
 TODO
 ----
 * [x] Implement placeholder setting
-* [ ] Document class properties
+* [x] Document class properties
 * [ ] Publish to NPM
 
 
 [Referenced links]:_________________________________________________________________
-[Atom]:           https://atom.io/
-[`fuzzy-finder`]: https://github.com/atom/fuzzy-finder#readme
-[`go-to-line`]:   https://github.com/atom/go-to-line#readme
-[`hidden`]:       https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/hidden
-[`<dialog>`]:     https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog
-[`<body>`]:       https://developer.mozilla.org/en-US/docs/Web/HTML/Element/body
+[Atom]:              https://atom.io/
+[`fuzzy-finder`]:    https://github.com/atom/fuzzy-finder#readme
+[`go-to-line`]:      https://github.com/atom/go-to-line#readme
+[`hidden`]:          https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/hidden
+[`<dialog>`]:        https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog
+[`<body>`]:          https://developer.mozilla.org/en-US/docs/Web/HTML/Element/body
+[`Boolean`]:         https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[`String`]:          https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String
+[`HTMLElement`]:     https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement
+[`HTMLFormElement`]: https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement
+[`TextEditor`]:      https://atom.io/docs/api/latest/TextEditor

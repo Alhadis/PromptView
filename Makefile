@@ -1,6 +1,9 @@
 all: lint browser-specs test
 
-lint:;  eslint .
+lint:
+	eslint .
+	mandoc -Tlint -Wwarning man/man?/*
+
 test:;  atom -t test
 clean:; rm -f *.tgz *.tar *.tar.gz
 

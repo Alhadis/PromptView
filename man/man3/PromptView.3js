@@ -1,0 +1,290 @@
+'\" t
+.\" -*- mode: nroff; coding: utf-8; -*- vim:set ft=nroff:
+.Dd August 21, 2018
+.Dt PROMPTVIEW 3
+.Os
+.Sh NAME
+.Nm PromptView
+.Nd modal dialogue for asynchronously prompting users for their input
+.
+.\" Define a nicer-looking double-colon for troff(1)
+.ie t .ds :: \z:\h'.66n':
+.el   .ds :: ::
+.
+.\" ============================================================================
+.Sh CONSTRUCTOR
+.Bd -literal \" JavaScript:
+new PromptView(options);
+.Ed
+.Pp
+Instantiate a new
+.Nm
+instance.
+.
+.Pp
+.Sy Arguments :
+.Bl -hyphen -compact
+.	It
+.		Em options Sy \*(:: Object ( Optional )
+.		br
+.		No Initial property values.
+.		No Valid properties are described under
+.		Sx INSTANCE PROPERTIES .
+.El
+.
+.
+.\" ============================================================================
+.Sh INSTANCE METHODS
+.
+.Ss "promptUser(options = {})"
+Present the dialogue to the user, resolving once they confirm an answer.
+.
+.Pp
+.Sy Arguments :
+.Bl -hyphen -compact
+.	It
+.		Em options Sy \*(:: Object ( Optional )
+.		br
+.		No Instance properties to update.
+.		No Valid properties are described under
+.		Sx INSTANCE PROPERTIES .
+.El
+.
+.Pp
+.Sy Return value :
+.	Bd -ragged -offset 4n -compact
+.	No   A
+.	Ql Promise
+.	No   which resolves to a
+.	Ql String
+.	No   containing the user's input,
+.	No   or the
+.	Ql null
+.	No   value if the prompt was cancelled for any reason.
+.Ed
+.
+.Pp
+.Sy Example :
+.Bd -literal -offset 4n -compact \" JavaScript:
+new PromptView().promptUser({
+\&    headerText: "Enter the name of a manual-page",
+\&    footerHTML: "E.g., <code>perl</code>, <code>grep(5)</code>",
+}).then(response => "dd(1)");
+.Ed
+.
+.\" ----------------------------------------------------------------------------
+.Ss "confirm(input)"
+Confirm user's response and invoke any unresolved prompt-handler.
+.Pp
+Used internally to cancel or confirm input in response to certain keystrokes.
+.
+.Pp
+.Sy Arguments :
+.Bl -hyphen -compact
+.	It
+.		Em options Sy \*(:: String | null
+.		br
+.		No Specify the user's answer .
+.		No Null values indicate cancelled prompts .
+.El
+.
+.\" ----------------------------------------------------------------------------
+.Ss "show()"
+.No Reveal prompt-view and set focus Em without No altering prompt state .
+.
+.Ss "hide()"
+.No Hide prompt-view and restore focus Em without No resolving current prompt .
+.
+.Ss "saveFocus()"
+.No Save whatever DOM element has user focus before displaying a dialogue .
+.
+.Ss "restoreFocus()"
+Restore focus to whatever element was holding it at the time the
+.Nm
+has been open.
+.Pp
+If the original element no longer exists in the DOM, focus is shifted to
+.Em atom.workspace.element
+as a last resort.
+.
+.\" ============================================================================
+.Sh INSTANCE PROPERTIES
+.Ss autoFocus
+.	Sy Type : No Boolean
+.	br
+.	Sy Default : Ql true
+.	Pp
+.	No Set and restore focus when toggling prompt .
+.
+.Ss autoHide
+.	Sy Type : No Boolean
+.	br
+.	Sy Default : Ql true
+.	Pp
+.	No Hide the prompt upon losing focus .
+.
+.Ss element
+.	Sy Type : No HTMLElement
+.	Pp
+.	No Top-level wrapper representing the Sy PromptView No in Atom's workspace .
+.
+.Ss elementClass
+.	Sy Type : No String
+.	br
+.	Sy Default : Dq prompt
+.	Pp
+.	No Space-separated list of CSS classes assigned to the instance's
+.	Sx element .
+.
+.Ss elementTagName
+.	Sy Type : No String
+.	br
+.	Sy Default : Dq div
+.	br
+.	Sy Read-only
+.	Pp
+.	No Name of the HTML tag used to create
+.	Sx element .
+.	No This property can only be set during construction ,
+.	No using the original option-hash passed to the constructor function .
+.
+.Ss footerClass
+.	Sy Type : No String
+.	br
+.	Sy Default : Dq prompt-footer
+.	Pp
+.	No Space-separated list of CSS classes assigned to instance's
+.	Sx footerElement .
+.
+.Ss footerElement
+.	Sy Type : No HTMLElement
+.	Pp
+.	No Content block displayed below
+.	Sx inputField ,
+.	No empty unless
+.	Sx headerText
+.	No or
+.	Sx headerHTML
+.	No have been assigned content .
+.
+.Ss footerHTML
+.	Sy Type : No String
+.	br
+.	Sy Default : Dq \&
+.	Pp
+.	No HTML representation of the
+.	Sx footerElement
+.	No contents.
+.
+.Ss footerTagName
+.	Sy Type : No String
+.	br
+.	Sy Default : Dq footer
+.	br
+.	Sy Read-only
+.	Pp
+.	No Name of the HTML tag used to create
+.	Sx footerElement .
+.	No This property can only be set during construction ,
+.	No using the original option-hash passed to the constructor function .
+.
+.Ss footerText
+.	Sy Type : No String
+.	br
+.	Sy Default : Dq \&
+.	Pp
+.	No A plain-text representation of the
+.	Sx footerElement
+.	No content .
+.
+.Ss headerClass
+.	Sy Type : No String
+.	br
+.	Sy Default : Dq prompt-header
+.	Pp
+.	No Space-separated list of CSS classes assigned to instance's
+.	Sx headerElement .
+.
+.Ss headerElement
+.	Sy Type : No HTMLElement
+.	Pp
+.	No Content block displayed above
+.	Sx inputField ,
+.	No empty unless
+.	Sx headerText
+.	No or
+.	Sx headerHTML
+.	No have been assigned content .
+.
+.Ss headerHTML
+.	Sy Type : No String
+.	br
+.	Sy Default : Dq \&
+.	Pp
+.	No HTML representation of the
+.	Sx headerElement
+.	No contents .
+.
+.Ss headerTagName
+.	Sy Type : No String
+.	br
+.	Sy Default : Dq header
+.	br
+.	Sy Read-only
+.	Pp
+.	No Name of the HTML tag used to create
+.	Sx headerElement .
+.	No This property can only be set during construction ,
+.	No using the original option-hash passed to the constructor function .
+.
+.Ss headerText
+.	Sy Type : No String
+.	br
+.	Sy Default : Dq \&
+.	Pp
+.	No A plain-text representation of the
+.	Sx headerElement
+.	No contents .
+.
+.Ss input
+.	Sy Type : No String
+.	br
+.	Sy Default : Dq \&
+.	Pp
+.	No Text currently entered into the instance's
+.	Sx inputField .
+.	No Writing to this property will replace whatever text has been entered in the field .
+.
+.Ss inputField
+.	Sy Type : No TextEditor , HTMLFormElement
+.	Pp
+.	No Miniature editing bar where user types their input .
+.
+.Ss isPending
+.	Sy Type : No Boolean
+.	br
+.	Sy Default : Ql false
+.	br
+.	Sy Read-only
+.	Pp
+.	No Whether the view is waiting for user to confirm their input.
+.
+.Ss placeholder
+.	Sy Type : No String
+.	br
+.	Sy Default : Dq \&
+.	Pp
+.	No Placeholder text displayed by
+.	Sx inputField
+.	No when empty .
+.
+.\" ============================================================================
+.Sh SEE ALSO
+.Xr atom 1
+.
+.\" ============================================================================
+.Sh AUTHORS
+Written and documented by
+.An John Gardner Aq Mt gardnerjohng@gmail.com .
+.Pp
+.Lk https://github.com/Alhadis "GitHub profile"
