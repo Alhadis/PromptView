@@ -91,12 +91,6 @@ The full list of supported properties are:
 <!------------------------------------------------------------------------------------------------------------------------------>
 
 
-TODO
-----
-* [x] Implement placeholder setting
-* [x] Document class properties
-* [ ] Publish to NPM
-
 
 [Referenced links]:_________________________________________________________________
 [Atom]:              https://atom.io/
