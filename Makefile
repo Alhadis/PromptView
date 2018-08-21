@@ -1,16 +1,20 @@
+SRC := prompt-view.js test/atom-specs.js test/utils.js
+MAN := man/man?/*
+
 all: lint browser-specs test
 
+# Run linters for various filetypes
 lint:
 	eslint .
-	mandoc -Tlint -Wwarning man/man?/*
+	mandoc -Tlint -Wwarning $(MAN)
 
-test:;  atom -t test
-clean:; rm -f *.tgz *.tar *.tar.gz
+# Run unit tests
+test:
+	atom -t test
 
-.PHONY: lint test clean
-
-
-SRC = prompt-view.js test/atom-specs.js test/utils.js
+# Nuke untracked or generated junk
+clean:
+	rm -f *.tgz *.tar *.tar.gz
 
 # Browserify Atom's specs for browser testing
 browser-specs: test/browser-specs.js
@@ -25,3 +29,7 @@ test/browser-specs.js: $(SRC)
 		s/require("mocha");$$/window.mocha;/; \
 		s/require("chai");$$/window.chai;/; \
 	' $@ && rm -f $@.bak
+
+
+# Fake targets, don't check timestamps
+.PHONY: lint test clean

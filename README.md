@@ -1,3 +1,5 @@
+<!-- -*- coding: utf-8; truncate-lines: t; -*- vim:set nowrap: -->
+
 PromptView
 ==========
 

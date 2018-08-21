@@ -1,13 +1,14 @@
 {
 	"name": "prompt-view",
 	"version": "v0.0.0",
+	"description": "Modal dialogue for asynchronously prompting users for their input.",
+	"keywords": ["prompt", "dialog", "dialogue", "modal", "atom", "window", "view"],
+	"author": "John Gardner <gardnerjohng@gmail.com>",
 	"license": "ISC",
 	"main": "prompt-view.js",
 	"man": "./man/man3/PromptView.3js",
 	"files": ["prompt-view.js", "man/**"],
-	"description": "Modal dialogue for asynchronously prompting users for their input.",
 	"repository": "https://github.com/Alhadis/PromptView",
-	"author": "John Gardner <gardnerjohng@gmail.com>",
 	"atomTestRunner": "atom-mocha",
 	"devDependencies": {
 		"atom-mocha": "^2.0.6",
