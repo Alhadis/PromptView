@@ -3,6 +3,10 @@
 PromptView
 ==========
 
+[![Build status: TravisCI][TravisCI-badge]][TravisCI-link]
+[![Build status: AppVeyor][AppVeyor-badge]][AppVeyor-link]
+
+
 Lightweight dialogue component for prompting user input.
 
 ![This probably isn't on your playlist](banner.png)
@@ -93,6 +97,10 @@ The full list of supported properties are:
 
 
 [Referenced links]:_________________________________________________________________
+[AppVeyor-badge]:    https://ci.appveyor.com/api/projects/status/6467e2m7fpnvfq1c?svg=true
+[AppVeyor-link]:     https://ci.appveyor.com/project/Alhadis/promptview
+[TravisCI-badge]:    https://travis-ci.org/Alhadis/PromptView.svg?branch=master
+[TravisCI-link]:     https://travis-ci.org/Alhadis/PromptView
 [Atom]:              https://atom.io/
 [`fuzzy-finder`]:    https://github.com/atom/fuzzy-finder#readme
 [`go-to-line`]:      https://github.com/atom/go-to-line#readme
