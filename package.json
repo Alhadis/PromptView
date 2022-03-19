@@ -9,12 +9,20 @@
 	"man": "./man/man3/PromptView.3js",
 	"files": ["prompt-view.js", "man/**"],
 	"repository": "https://github.com/Alhadis/PromptView",
-	"eslintConfig": {"extends": "@alhadis/eslint-config/atom"},
+	"eslintConfig": {
+		"extends": "@alhadis/eslint-config/atom",
+		"overrides": [{
+			"files": ["prompt-view.js"],
+			"rules": {"keyword-spacing": 0}
+		}]
+	},
+	"type": "script",
 	"atomTestRunner": "atom-mocha",
 	"devDependencies": {
-		"@alhadis/eslint-config": "^1.2.0",
-		"atom-mocha": "^2.2.0",
-		"browserify": "^16.2.3",
-		"eslint": "^5.16.0"
+		"@alhadis/eslint-config": "^2.3.4",
+		"atom-mocha": "^2.2.2",
+		"browserify": "^17.0.0",
+		"chai": "^4.3.6",
+		"eslint": "^8.11.0"
 	}
 }
