@@ -1,9 +1,5 @@
 "use strict";
 
-const Chai = require("chai");
-const {expect} = Chai;
-Chai.should();
-
 describe("PromptView", () => {
 	const {delay, cancel, confirm} = require("./utils.js");
 	const PromptView = require("../prompt-view.js");

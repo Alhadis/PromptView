@@ -256,7 +256,7 @@ class PromptView{
 		this.autoFocus && this.saveFocus();
 		if(atom && this.panel)
 			this.panel.show();
-		else ("dialog" === this.elementTagName)
+		else "dialog" === this.elementTagName
 			? this.element.show()
 			: this.element.hidden = false;
 		this.autoFocus && this.inputField.element.focus();
@@ -270,7 +270,7 @@ class PromptView{
 	hide(){
 		if(atom && this.panel)
 			this.panel.hide();
-		else ("dialog" === this.elementTagName)
+		else "dialog" === this.elementTagName
 			? this.element.close()
 			: this.element.hidden = true;
 		this.autoFocus && this.restoreFocus();
